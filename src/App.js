@@ -3,17 +3,17 @@ import WeatherCard from './components/WeatherCard';
 import SearchSection from './components/SearchSection';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorMessage from './components/ErrorMessage';
-import WeatherHistory from './components/WeatherHistory';
+import WeatherHistoryAndForecast from './components/WeatherHistoryAndForecast';
 import RealGlobe from './components/RealGlobe';
 import DarkModeToggle from './components/DarkModeToggle';
-import { fetchWeatherData, fetchCitySuggestions, fetchWeatherHistory } from './services/weatherService';
+import { fetchWeatherData, fetchCitySuggestions, fetchCompleteWeatherData } from './services/weatherService';
 import './styles/Weather.css';
 
 function App() {
   const [weatherData, setWeatherData] = useState(null);
-  const [weatherHistory, setWeatherHistory] = useState([]);
+  const [completeWeatherData, setCompleteWeatherData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [historyLoading, setHistoryLoading] = useState(false);
+  const [weatherHistoryLoading, setWeatherHistoryLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -23,7 +23,7 @@ function App() {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     return saved !== null ? JSON.parse(saved) : prefersDark;
   });
-  const [selectedCoordinates, setSelectedCoordinates] = useState([6.9271, 79.8612]); // Colombo default
+  const [selectedCoordinates, setSelectedCoordinates] = useState([6.9271, 79.8612]);
 
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
@@ -34,23 +34,25 @@ function App() {
     try {
       setLoading(true);
       setError(null);
-      const data = await fetchWeatherData(location);
-      setWeatherData(data);
 
-      // Update coordinates for globe
-      if (data.coordinates) {
-        setSelectedCoordinates([data.coordinates.lat, data.coordinates.lon]);
+      // Fetch current weather
+      const currentData = await fetchWeatherData(location);
+      setWeatherData(currentData);
+
+      if (currentData.coordinates) {
+        setSelectedCoordinates([currentData.coordinates.lat, currentData.coordinates.lon]);
       }
 
-      // Load weather history
-      setHistoryLoading(true);
-      const history = await fetchWeatherHistory(location);
-      setWeatherHistory(history);
+      // Fetch complete weather data (history + forecast)
+      setWeatherHistoryLoading(true);
+      const completeData = await fetchCompleteWeatherData(location);
+      setCompleteWeatherData(completeData);
+
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
-      setHistoryLoading(false);
+      setWeatherHistoryLoading(false);
     }
   };
 
@@ -139,7 +141,7 @@ function App() {
         <div className="header-content">
           <div className="header-left">
             <h1>🌤️ Global Weather</h1>
-            <p>Current weather conditions worldwide</p>
+            <p>14-day weather timeline worldwide</p>
           </div>
           <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
         </div>
@@ -178,9 +180,9 @@ function App() {
         </div>
 
         {weatherData && (
-          <WeatherHistory
-            history={weatherHistory}
-            loading={historyLoading}
+          <WeatherHistoryAndForecast
+            weatherData={completeWeatherData}
+            loading={weatherHistoryLoading}
             locationName={weatherData.location}
           />
         )}
