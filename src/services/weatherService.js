@@ -19,6 +19,10 @@ export const fetchWeatherData = async (location = 'Colombo') => {
       location: data.location.name,
       country: data.location.country,
       region: data.location.region,
+      coordinates: {
+        lat: data.location.lat,
+        lon: data.location.lon
+      },
       localTime: data.location.localtime,
       temperature: {
         celsius: data.current.temp_c,
@@ -34,17 +38,43 @@ export const fetchWeatherData = async (location = 'Colombo') => {
       uvIndex: data.current.uv,
       visibility: data.current.vis_km,
       cloudCover: data.current.cloud,
-      airQuality: data.current.air_quality ? {
-        co: data.current.air_quality.co,
-        no2: data.current.air_quality.no2,
-        o3: data.current.air_quality.o3,
-        pm2_5: data.current.air_quality.pm2_5,
-        pm10: data.current.air_quality.pm10
-      } : null,
       lastUpdated: data.current.last_updated
     };
   } catch (error) {
     throw new Error(`Failed to fetch weather data: ${error.message}`);
+  }
+};
+
+export const fetchWeatherHistory = async (location, days = 7) => {
+  try {
+    const promises = [];
+    const today = new Date();
+    
+    for (let i = 1; i <= days; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      
+      promises.push(
+        fetch(`${BASE_URL}/history.json?key=${API_KEY}&q=${location}&dt=${dateStr}`)
+          .then(res => res.json())
+      );
+    }
+    
+    const results = await Promise.all(promises);
+    
+    return results.map(data => ({
+      date: data.forecast.forecastday[0].date,
+      maxTemp: Math.round(data.forecast.forecastday[0].day.maxtemp_c),
+      minTemp: Math.round(data.forecast.forecastday[0].day.mintemp_c),
+      condition: data.forecast.forecastday[0].day.condition,
+      humidity: data.forecast.forecastday[0].day.avghumidity,
+      windSpeed: Math.round(data.forecast.forecastday[0].day.maxwind_kph),
+      uvIndex: data.forecast.forecastday[0].day.uv
+    })).reverse();
+  } catch (error) {
+    console.error('Failed to fetch weather history:', error);
+    return [];
   }
 };
 

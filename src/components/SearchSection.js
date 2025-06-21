@@ -45,7 +45,7 @@ const SearchSection = ({
           </div>
         )}
       </form>
-      
+      <br />
       <button onClick={onLocationAccess} className="location-btn">
         📍 Use My Location
       </button>
