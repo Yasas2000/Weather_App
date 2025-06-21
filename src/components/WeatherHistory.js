@@ -23,7 +23,7 @@ const WeatherHistory = ({ history, loading, locationName }) => {
     <div className="weather-history">
       <h2>📅 Recent Weather History - {locationName}</h2>
       <div className="history-grid">
-        {history.map((day, index) => (
+        {history.slice().reverse().map((day, index) => (
           <div key={index} className="history-card">
             <div className="history-date">
               {new Date(day.date).toLocaleDateString('en-US', {
