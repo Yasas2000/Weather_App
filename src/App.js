@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import WeatherCard from './components/WeatherCard';
 import SearchSection from './components/SearchSection';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -36,12 +36,12 @@ function App() {
       setError(null);
       const data = await fetchWeatherData(location);
       setWeatherData(data);
-      
+
       // Update coordinates for globe
       if (data.coordinates) {
         setSelectedCoordinates([data.coordinates.lat, data.coordinates.lon]);
       }
-      
+
       // Load weather history
       setHistoryLoading(true);
       const history = await fetchWeatherHistory(location);
@@ -102,7 +102,7 @@ function App() {
         (error) => {
           setLoading(false);
           let errorMessage = 'Location access denied.';
-          switch(error.code) {
+          switch (error.code) {
             case error.PERMISSION_DENIED:
               errorMessage = 'Location access denied. Please enable location permissions in your browser.';
               break;
@@ -144,7 +144,7 @@ function App() {
           <DarkModeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
         </div>
       </header>
-      
+
       <main className="app-main">
         <SearchSection
           searchQuery={searchQuery}
@@ -161,16 +161,16 @@ function App() {
             {loading && <LoadingSpinner />}
             {error && <ErrorMessage error={error} onRetry={() => loadWeatherData()} />}
             {weatherData && !loading && !error && (
-              <WeatherCard 
-                data={weatherData} 
-                onRefresh={() => loadWeatherData(weatherData.location)} 
+              <WeatherCard
+                data={weatherData}
+                onRefresh={() => loadWeatherData(weatherData.location)}
               />
             )}
           </div>
 
           <div className="globe-section">
-            <RealGlobe 
-              coordinates={selectedCoordinates} 
+            <RealGlobe
+              coordinates={selectedCoordinates}
               locationName={weatherData?.location}
               darkMode={darkMode}
             />
@@ -178,8 +178,8 @@ function App() {
         </div>
 
         {weatherData && (
-          <WeatherHistory 
-            history={weatherHistory} 
+          <WeatherHistory
+            history={weatherHistory}
             loading={historyLoading}
             locationName={weatherData.location}
           />

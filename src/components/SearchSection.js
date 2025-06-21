@@ -27,7 +27,7 @@ const SearchSection = ({
             🔍 Search
           </button>
         </div>
-        
+
         {showSuggestions && suggestions.length > 0 && (
           <div className="suggestions-dropdown">
             {suggestions.map((suggestion) => (
