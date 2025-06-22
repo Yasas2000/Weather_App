@@ -108,9 +108,9 @@ const WeatherHistoryAndForecast = ({ weatherData, loading, locationName }) => {
                     className="timeline-icon"
                   />
                   <div className="timeline-temps">
-                    <span className="max-temp">{day.maxTemp}°</span>
+                    <span className="max-temp">{day.maxTemp}°C</span>
                     <span className="temp-divider">/</span>
-                    <span className="min-temp">{day.minTemp}°</span>
+                    <span className="min-temp">{day.minTemp}°C</span>
                   </div>
                 </div>
 
