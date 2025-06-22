@@ -857,10 +857,6 @@ body {
     flex-direction: column;
     gap: 20px;
   }
-
-  .app{
-    display: flex;
-  }
 }
 
 @media (max-width: 768px) {
