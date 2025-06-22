@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Globe from 'react-globe.gl';
 
-const RealGlobe = ({ coordinates, locationName, darkMode }) => {
+const RealGlobe = ({ coordinates, locationName, darkMode, onLocationSelect }) => {
     const globeEl = useRef();
     const [globeReady, setGlobeReady] = useState(false);
     const [markers, setMarkers] = useState([]);
@@ -12,7 +12,7 @@ const RealGlobe = ({ coordinates, locationName, darkMode }) => {
             setMarkers([{
                 lat: lat,
                 lng: lng,
-                size: 0.5,
+                size: 0.8,
                 color: '#ff4444',
                 label: locationName || 'Selected Location'
             }]);
@@ -37,6 +37,28 @@ const RealGlobe = ({ coordinates, locationName, darkMode }) => {
         }
     };
 
+    const handleGlobeClick = (event) => {
+        if (!globeEl.current || !onLocationSelect) return;
+        
+        // Pause auto-rotation when user clicks
+        globeEl.current.controls().autoRotate = false;
+        
+        if (event) {
+            const { lat, lng } = event;
+            console.log('Globe clicked at:', lat, lng);
+            
+            // Call the parent component's callback with coordinates
+            onLocationSelect(lat, lng);
+            
+            // Resume auto-rotation after 3 seconds
+            setTimeout(() => {
+                if (globeEl.current) {
+                    globeEl.current.controls().autoRotate = true;
+                }
+            }, 3000);
+        }
+    };
+
     const handleMarkerClick = (marker) => {
         if (globeEl.current) {
             globeEl.current.pointOfView({
@@ -49,13 +71,13 @@ const RealGlobe = ({ coordinates, locationName, darkMode }) => {
 
     return (
         <div className="real-globe-container">
-            <h3>🌍 {locationName || 'Select Location'}</h3>
+            <h3>🌍 {locationName || 'Click on globe to select location'}</h3>
 
             <div className="globe-wrapper">
                 <Globe
                     ref={globeEl}
-                    width={300}
-                    height={300}
+                    width={320}
+                    height={320}
                     backgroundColor={darkMode ? '#1a1a2e' : '#000011'}
                     globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
                     bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
@@ -66,16 +88,19 @@ const RealGlobe = ({ coordinates, locationName, darkMode }) => {
 
                     // Points layer for markers
                     pointsData={markers}
-                    pointAltitude={0.01}
-                    pointRadius={0.5}
+                    pointAltitude={0.02}
+                    pointRadius={0.8}
                     pointColor="color"
                     pointLabel="label"
                     onPointClick={handleMarkerClick}
 
+                    // Globe click handler for location selection
+                    onGlobeClick={handleGlobeClick}
+
                     // Atmosphere
                     showAtmosphere={true}
                     atmosphereColor={darkMode ? '#4a90e2' : '#87ceeb'}
-                    atmosphereAltitude={0.15}
+                    atmosphereAltitude={0.2}
 
                     // Events
                     onGlobeReady={handleGlobeReady}
@@ -99,6 +124,7 @@ const RealGlobe = ({ coordinates, locationName, darkMode }) => {
                 )}
                 <div className="globe-instructions">
                     <small>
+                        • Click anywhere on globe to select location<br/>
                         • Drag to rotate • Scroll to zoom • Click marker to focus
                     </small>
                 </div>

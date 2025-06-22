@@ -167,3 +167,19 @@ export const fetchCitySuggestions = async (query) => {
     throw new Error(`Failed to fetch suggestions: ${error.message}`);
   }
 };
+
+export const getLocationName = async (lat, lng) => {
+    try {
+        const response = await fetch(
+            `${BASE_URL}/search.json?key=${API_KEY}&q=${lat},${lng}`
+        );
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+            return `${data[0].name}, ${data[0].country}`;
+        }
+        return `${lat.toFixed(2)}, ${lng.toFixed(2)}`;
+    } catch (error) {
+        return `${lat.toFixed(2)}, ${lng.toFixed(2)}`;
+    }
+ };

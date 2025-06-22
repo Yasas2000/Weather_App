@@ -6,7 +6,7 @@ import ErrorMessage from './components/ErrorMessage';
 import WeatherHistoryAndForecast from './components/WeatherHistoryAndForecast';
 import RealGlobe from './components/RealGlobe';
 import DarkModeToggle from './components/DarkModeToggle';
-import { fetchWeatherData, fetchCitySuggestions, fetchCompleteWeatherData } from './services/weatherService';
+import { fetchWeatherData, fetchCitySuggestions, fetchCompleteWeatherData, getLocationName } from './services/weatherService';
 import './styles/Weather.css';
 
 function App() {
@@ -85,6 +85,27 @@ function App() {
       setShowSuggestions(false);
     }
   };
+
+  const handleGlobeLocationSelect = async (lat, lng) => {
+    try {
+        console.log('Location selected from globe:', lat, lng);
+        
+        setLoading(true);
+        setError(null);
+        
+        // Get location name first
+        const locationName = await getLocationName(lat, lng);
+        console.log('Location name:', locationName);
+        
+        // Fetch weather data using coordinates
+        await loadWeatherData(`${lat},${lng}`);
+        
+    } catch (error) {
+        console.error('Failed to load weather for selected location:', error);
+        setError('Failed to load weather for selected location');
+        setLoading(false);
+    }
+};
 
   const handleSuggestionClick = (suggestion) => {
     setSearchQuery(suggestion.name);
@@ -175,6 +196,7 @@ function App() {
               coordinates={selectedCoordinates}
               locationName={weatherData?.location}
               darkMode={darkMode}
+              onLocationSelect={handleGlobeLocationSelect}
             />
           </div>
         </div>
