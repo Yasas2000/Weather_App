@@ -14,7 +14,7 @@ A modern, responsive weather app built with React.js showing real-time weather f
 
 ## 🚀 Live Demo
 
-[View Application](https://your-weather-app-url.vercel.app)
+[View Application-vercel](https://global-weather-app-five.vercel.app/) or [View Application-railway](https://global-weather-app.up.railway.app)
 
 ## 🛠️ Tech Stack
 
